@@ -16,7 +16,7 @@ pub static LEAF_NODE_STRING: &'static str = "leaf";
 pub static BRANCH_NODE_STRING: &'static str = "branch";
 pub static EXTENSION_NODE_STRING: &'static str = "extension";
 pub const HASHED_NULL_NODE: H256 = H256(HASHED_NULL_NODE_BYTES);
-pub static DEFAULT_ENDPOINT: &'static str = "http://localhost:8545/";
+pub static DEFAULT_ENDPOINT: &'static str = "https://mainnet.infura.io/v3/9c7178cede9f4a8a84a151d058bd609c";
 pub const EMPTY_NIBBLES: Nibbles = Nibbles { data: Vec::new(), offset: 0 };
 
 const HASHED_NULL_NODE_BYTES: [u8; 32] = [ // NOTE: keccak hash of the RLP of null
