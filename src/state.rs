@@ -13,6 +13,7 @@ use crate::types::{
     NodeStack,
 };
 
+#[derive(Debug)]
 pub struct State {
     pub tx_hash: H256,
     pub database: Database,

@@ -48,28 +48,45 @@ use crate::get_branch_from_trie::get_branch_from_trie_and_put_in_state;
 use crate::get_hex_proof_from_branch::get_hex_proof_from_branch_in_state;
 use crate::initialize_state_from_cli_args::initialize_state_from_cli_args;
 use crate::get_receipts::get_all_receipts_from_block_in_state_and_set_in_state;
+use crate::state::State;
+use crate::utils::convert_hex_to_h256;
 
-fn main() {
-    match parse_cli_args()
-        .and_then(validate_cli_args)
-        .and_then(initialize_state_from_cli_args)
-        .and_then(get_endpoint_and_set_in_state)
+pub fn get_hex_proof(tx_hash: String) -> Result<types::HexProof, errors::AppError>{
+    State::init(
+        convert_hex_to_h256(tx_hash.clone())?,
+        tx_hash,
+    ).and_then(get_endpoint_and_set_in_state)
         .and_then(connect_to_node)
         .and_then(get_block_from_tx_hash_in_state_and_set_in_state)
         .and_then(get_all_receipts_from_block_in_state_and_set_in_state)
         .and_then(get_tx_index_and_add_to_state)
         .and_then(get_receipts_trie_and_set_in_state)
         .and_then(get_branch_from_trie_and_put_in_state)
-        .and_then(get_hex_proof_from_branch_in_state) {
-            Ok(hex_proof) => {
-                info!("✔ Hex Proof:\n");
-                trace!("{}", hex_proof);
-                println!("{}", hex_proof);
-            },
-            Err(e) => {
-                error!("{}", e);
-                println!("{}", e);
-                std::process::exit(1);
-            }
-        }
+        .and_then(get_hex_proof_from_branch_in_state)
+
+
 }
+// fn main() {
+//     match parse_cli_args()
+//         .and_then(validate_cli_args)
+//         .and_then(initialize_state_from_cli_args)
+//         .and_then(get_endpoint_and_set_in_state)
+//         .and_then(connect_to_node)
+//         .and_then(get_block_from_tx_hash_in_state_and_set_in_state)
+//         .and_then(get_all_receipts_from_block_in_state_and_set_in_state)
+//         .and_then(get_tx_index_and_add_to_state)
+//         .and_then(get_receipts_trie_and_set_in_state)
+//         .and_then(get_branch_from_trie_and_put_in_state)
+//         .and_then(get_hex_proof_from_branch_in_state) {
+//         Ok(hex_proof) => {
+//             info!("✔ Hex Proof:\n");
+//             trace!("{}", hex_proof);
+//             println!("{}", hex_proof);
+//         },
+//         Err(e) => {
+//             error!("{}", e);
+//             println!("{}", e);
+//             std::process::exit(1);
+//         }
+//     }
+// }

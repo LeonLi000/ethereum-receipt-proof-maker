@@ -22,6 +22,7 @@ pub fn make_rpc_call(endpoint: &str, json: Json) -> Result<reqwest::Response> {
 
 pub fn get_response_text(mut res: reqwest::Response) -> Result<String> {
     let res_text = res.text()?;
+    info!("res text: {:?}", res_text);
     match res_text.contains("error") {
         true => Err(
             AppError::Custom(

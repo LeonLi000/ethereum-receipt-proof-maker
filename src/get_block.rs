@@ -35,7 +35,7 @@ pub fn deserialize_block_json_to_block_struct(
 ) -> Result<Block> {
     Ok(
         Block {
-            author: convert_hex_to_address(block_json.author)?,
+            // author: convert_hex_to_address(block_json.author)?,
             difficulty: convert_hex_to_u256(block_json.difficulty)?,
             extra_data: convert_hex_to_bytes(block_json.extraData)?,
             gas_limit: convert_hex_to_u256(block_json.gasLimit)?,
@@ -50,10 +50,10 @@ pub fn deserialize_block_json_to_block_struct(
             number: convert_hex_to_u256(block_json.number)?,
             parent_hash: convert_hex_to_h256(block_json.parentHash)?,
             receipts_root: convert_hex_to_h256(block_json.receiptsRoot)?,
-            seal_fields: (
-                convert_hex_to_bytes(block_json.sealFields.0)?,
-                convert_hex_to_u256(block_json.sealFields.1)?
-            ),
+            // seal_fields: (
+            //     convert_hex_to_bytes(block_json.sealFields.0)?,
+            //     convert_hex_to_u256(block_json.sealFields.1)?
+            // ),
             sha3_uncles: convert_hex_to_h256(block_json.sha3Uncles)?,
             size: convert_hex_to_u256(block_json.size)?,
             state_root: convert_hex_to_h256(block_json.stateRoot)?,

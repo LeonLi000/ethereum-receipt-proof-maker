@@ -32,7 +32,7 @@ use crate::types::{
     NodeStack,
 };
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct Trie {
     pub root: H256,
     pub database: Database,

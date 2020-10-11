@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BranchesTreeState">
+    <expand>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="LOCAL_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+      <path>
+        <item name="ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="REMOTE_ROOT" type="e8cecc67:BranchNodeDescriptor" />
+        <item name="GROUP_NODE:origin" type="e8cecc67:BranchNodeDescriptor" />
+      </path>
+    </expand>
+    <select />
+  </component>
+  <component name="CMakeRunConfigurationManager" shouldGenerate="true" shouldDeleteObsolete="true">
+    <generated />
+  </component>
+  <component name="CMakeSettings">
+    <configurations>
+      <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
+    </configurations>
+  </component>
+  <component name="CargoProjects">
+    <cargoProject FILE="$PROJECT_DIR$/Cargo.toml" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="3f52152f-7c87-4815-91a4-a55dc4e0cef9" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/connect_to_node.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/connect_to_node.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/get_block.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/get_block.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/get_endpoint.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/get_endpoint.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/get_receipts.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/get_receipts.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/main.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/make_rpc_call.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/make_rpc_call.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/state.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/state.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/trie.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/trie.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/src/types.rs" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MacroExpansionManager">
+    <option name="directoryName" value="4svhmzmr" />
+  </component>
+  <component name="ProjectId" id="1iYLW4v3Ey71upNM47YQAXXgRbi" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="cf.first.check.clang-format" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_package_manager_path" value="npm" />
+    <property name="org.rust.cargo.project.model.PROJECT_DISCOVERY" value="true" />
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="GradleAppRunConfiguration" factoryName="Application" REDIRECT_INPUT="false" PASS_PARENT_ENVS_2="true">
+      <method v="2">
+        <option name="com.jetbrains.cidr.cpp.gradle.execution.GradleNativeBuildBeforeRunTaskProvider$BuildBeforeRunTask" enabled="true" />
+      </method>
+    </configuration>
+  </component>
+  <component name="RustProjectSettings">
+    <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="3f52152f-7c87-4815-91a4-a55dc4e0cef9" name="Default Changelist" comment="" />
+      <created>1602079609051</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1602079609051</updated>
+      <workItem from="1602079610401" duration="15843000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="575" y="304" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1602125432520">
+      <screen x="0" y="23" width="1680" height="952" />
+    </state>
+    <state x="575" y="304" key="#com.intellij.fileTypes.FileTypeChooser/0.23.1680.952@0.23.1680.952" timestamp="1602125432520" />
+    <state x="541" y="251" width="757" height="493" key="find.popup" timestamp="1602126797606">
+      <screen x="0" y="23" width="1680" height="952" />
+    </state>
+    <state x="541" y="250" width="598" height="490" key="find.popup/0.23.1680.947@0.23.1680.947" timestamp="1602082774855" />
+    <state x="541" y="251" width="757" height="493" key="find.popup/0.23.1680.952@0.23.1680.952" timestamp="1602126797606" />
+  </component>
+</project>

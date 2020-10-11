@@ -52,12 +52,12 @@ pub fn deserialize_receipt_json_to_receipt_struct(
                     convert_json_value_to_string(receipt.to)?
                 )?,
             },
-            root: match receipt.root {
-                serde_json::Value::Null => H256::zero(),
-                _ => convert_hex_to_h256(
-                    convert_json_value_to_string(receipt.root)?
-                )?,
-            },
+            // root: match receipt.root {
+            //     serde_json::Value::Null => H256::zero(),
+            //     _ => convert_hex_to_h256(
+            //         convert_json_value_to_string(receipt.root)?
+            //     )?,
+            // },
             contract_address: match receipt.contractAddress {
                 serde_json::Value::Null => Address::zero(),
                 _ => convert_hex_to_address(

@@ -30,7 +30,7 @@ pub struct ReceiptRpcResponse { pub result: ReceiptJson }
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Block {
-    pub author: Address,
+    // pub author: Address,
     pub difficulty: U256,
     pub extra_data: Bytes,
     pub gas_limit: U256,
@@ -43,7 +43,7 @@ pub struct Block {
     pub number: U256,
     pub parent_hash: H256,
     pub receipts_root: H256,
-    pub seal_fields: (Bytes, U256),
+    // pub seal_fields: (Bytes, U256),
     pub sha3_uncles: H256,
     pub size: U256,
     pub state_root: H256,
@@ -68,7 +68,7 @@ pub struct Receipt {
     pub transaction_index: U256,
     pub contract_address: Address,
     pub logs: Vec<Log>,
-    pub root: H256,
+    // pub root: H256,
     pub logs_bloom: Bloom,
 }
 
@@ -115,7 +115,7 @@ impl Encodable for Log {
 #[allow(non_snake_case)]
 #[derive(Debug, Deserialize)]
 pub struct BlockJson {
-    pub author: String,
+    // pub author: String,
     pub difficulty: String,
     pub extraData: String,
     pub gasLimit: String,
@@ -128,7 +128,7 @@ pub struct BlockJson {
     pub number: String,
     pub parentHash: String,
     pub receiptsRoot: String,
-    pub sealFields: (String, String),
+    // pub sealFields: (String, String),
     pub sha3Uncles: String,
     pub size: String,
     pub stateRoot: String,
@@ -150,7 +150,7 @@ pub struct ReceiptJson {
     pub logs: Vec<LogJson>,
     pub blockNumber: String,
     pub to: serde_json::Value,
-    pub root: serde_json::Value,
+    // pub root: serde_json::Value,
     pub transactionHash: String,
     pub transactionIndex: String,
     pub cumulativeGasUsed: String,
@@ -162,7 +162,7 @@ pub struct ReceiptJson {
 pub struct LogJson {
     pub data: String,
     pub removed: bool,
-    pub r#type: String,
+    // pub r#type: String,
     pub address: String,
     pub logIndex: String,
     pub blockHash: String,

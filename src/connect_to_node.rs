@@ -4,6 +4,7 @@ use crate::get_block::get_block_by_number;
 
 pub fn connect_to_node(state: State) -> Result<State> {
     info!("✔ Connecting to node...");
+    info!("state:{:?}", state);
     get_block_by_number(State::get_endpoint_from_state(&state)?, "latest")
         .and_then(|block| {
             info!(

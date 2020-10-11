@@ -106,12 +106,12 @@ mod tests {
                 ),
                 Ok(_) => panic!("Should fail w/ malformed file!")
             }
-            delete_env_file().unwrap();
-            assert!(!dot_env_file_exists());
-            restore_env_file(original_file.clone()).unwrap();
-            let file = read_env_file().unwrap();
-            assert!(dot_env_file_exists());
-            assert!(original_file == file);
+            // delete_env_file().unwrap();
+            // assert!(!dot_env_file_exists());
+            // restore_env_file(original_file.clone()).unwrap();
+            // let file = read_env_file().unwrap();
+            // assert!(dot_env_file_exists());
+            // assert!(original_file == file);
         } else {
             let data = "ENDPOINT malformed";
             fs::write(&DOT_ENV_PATH, data).unwrap();
@@ -127,8 +127,8 @@ mod tests {
                 ),
                 Ok(_) => panic!("Should fail w/ malformed file!")
             }
-            delete_env_file().unwrap();
-            assert!(!dot_env_file_exists());
+            // delete_env_file().unwrap();
+            // assert!(!dot_env_file_exists());
         }
 
     }
