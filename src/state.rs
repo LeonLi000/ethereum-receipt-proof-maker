@@ -12,6 +12,7 @@ use crate::types::{
     Database,
     NodeStack,
 };
+use crate::constants;
 
 #[derive(Debug)]
 pub struct State {
@@ -37,7 +38,7 @@ impl State {
                 block: None,
                 index: None,
                 branch: None,
-                endpoint: None,
+                endpoint: Option::Some(String::from(constants::DEFAULT_ENDPOINT)),
                 receipts: None,
                 tx_hash_string,
                 receipts_trie: None,
