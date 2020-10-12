@@ -3,3 +3,9 @@
 *.sw*
 /target
 **/*.rs.bk
+build/*
+.cache/.cargo/*
+!.gitkeep
+.tmp/
+**.idea
+**.DS_Store
