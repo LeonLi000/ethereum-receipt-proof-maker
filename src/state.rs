@@ -31,6 +31,7 @@ impl State {
     pub fn init(
         tx_hash: H256,
         tx_hash_string: String,
+        endpoint: Option<String>,
     ) -> Result<State> {
         Ok(
             State {
@@ -38,7 +39,7 @@ impl State {
                 block: None,
                 index: None,
                 branch: None,
-                endpoint: Option::Some(String::from(constants::DEFAULT_ENDPOINT)),
+                endpoint,
                 receipts: None,
                 tx_hash_string,
                 receipts_trie: None,
