@@ -50,11 +50,11 @@ use crate::types::{
 };
 use rlp::{Encodable, RlpStream};
 
-pub fn generate_eth_proof(tx_hash: String, endpoint: &str) -> Result<(types::HexProof, String, String), errors::AppError>{
+pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<(types::HexProof, String, String), errors::AppError>{
     let proof = State::init(
         convert_hex_to_h256(tx_hash.clone())?,
         tx_hash.clone(),
-        Some(String::from(endpoint))
+        Some(endpoint.clone())
     )
         .and_then(get_block_from_tx_hash_in_state_and_set_in_state)
         .and_then(get_all_receipts_from_block_in_state_and_set_in_state)
@@ -62,7 +62,7 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: &str) -> Result<(types::Hex
         .and_then(get_receipts_trie_and_set_in_state)
         .and_then(get_branch_from_trie_and_put_in_state).and_then(get_hex_proof_from_branch_in_state);
 
-    let mut res_receipt = get_receipt_from_tx_hash(endpoint, tx_hash.clone().as_str());
+    let mut res_receipt = get_receipt_from_tx_hash(endpoint.clone().as_str(), tx_hash.clone().as_str());
     let mut stream = RlpStream::new();
     let receipt =  res_receipt.unwrap();
     let logs = &receipt.logs;
@@ -85,7 +85,7 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: &str) -> Result<(types::Hex
 fn test_get_hex_proof() {
     let endpoint = "https://mainnet.infura.io/v3/9c7178cede9f4a8a84a151d058bd609c";
     let tx_hash = "0xb540248a9cca048c5861dec953d7a776bc1944319b9bd27a462469c8a437f4ff";
-    let proof = generate_eth_proof(String::from(tx_hash), endpoint);
+    let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint));
     match proof {
         Ok(proof)=>{println!("{:?}", proof.clone());},
         Err(err) =>{println!("{:?}", err);}
