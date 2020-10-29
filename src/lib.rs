@@ -50,7 +50,7 @@ use crate::types::{
 };
 use rlp::{Encodable, RlpStream};
 
-pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<(types::HexProof, String, String), errors::AppError>{
+pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<(types::HexProof, String, String, u32, i32), errors::AppError>{
     let proof = State::init(
         convert_hex_to_h256(tx_hash.clone())?,
         tx_hash.clone(),
@@ -61,20 +61,31 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<(types::H
         .and_then(get_tx_index_and_add_to_state)
         .and_then(get_receipts_trie_and_set_in_state)
         .and_then(get_branch_from_trie_and_put_in_state).and_then(get_hex_proof_from_branch_in_state);
-
     let mut res_receipt = get_receipt_from_tx_hash(endpoint.clone().as_str(), tx_hash.clone().as_str());
     let mut stream = RlpStream::new();
+    println!("res: {:?}", res_receipt);
     let receipt =  res_receipt.unwrap();
     let logs = &receipt.logs;
     receipt.rlp_append(&mut stream);
     let receipt_data = hex::encode(stream.out());
     let mut log_data = String::new();
+    let mut log_index = -1;
+    let mut is_exist = false;
     for item in logs {
-        let mut stream = RlpStream::new();
-        item.rlp_append(&mut stream);
-        log_data = format!("{}{}", log_data, hex::encode(stream.out()));
+        println!("log: {:?}", item);
+        log_index += 1;
+        if hex::encode(item.topics[0].0) == constants::LOCK_EVENT_STRING {
+            let mut stream = RlpStream::new();
+            item.rlp_append(&mut stream);
+            log_data = hex::encode(stream.out());
+            is_exist = true;
+            break;
+        }
     }
-    Ok((proof.unwrap(), receipt_data, log_data))
+    if !is_exist {
+        return Err(errors::AppError::Custom(String::from("the locked tx is not exist.")));
+    }
+    Ok((proof.unwrap(), receipt_data, log_data, receipt.transaction_index.as_u32(), log_index))
 
 
 }
@@ -83,8 +94,8 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<(types::H
 
 #[test]
 fn test_get_hex_proof() {
-    let endpoint = "https://mainnet.infura.io/v3/9c7178cede9f4a8a84a151d058bd609c";
-    let tx_hash = "0xb540248a9cca048c5861dec953d7a776bc1944319b9bd27a462469c8a437f4ff";
+    let endpoint = "http://127.0.0.1:9545";
+    let tx_hash = "0xcc699808af959a6c058a3b77f14f9dc18658c02b1b427d9d3cde01e370802ccf";
     let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint));
     match proof {
         Ok(proof)=>{println!("{:?}", proof.clone());},
@@ -98,6 +109,7 @@ fn test_get_receipt_from_txhash() {
     let tx_hash = "0xb540248a9cca048c5861dec953d7a776bc1944319b9bd27a462469c8a437f4ff";
     let endpoint = "https://mainnet.infura.io/v3/9c7178cede9f4a8a84a151d058bd609c";
     let res = get_receipt_from_tx_hash(endpoint, tx_hash);
+    println!("{:?}", res);
     let mut stream = RlpStream::new();
     res.unwrap().rlp_append(&mut stream);
     println!("{:?}", hex::encode(stream.out()));
@@ -105,9 +117,10 @@ fn test_get_receipt_from_txhash() {
 
 #[test]
 fn test_get_log_from_txhash() {
-    let tx_hash = "0xb540248a9cca048c5861dec953d7a776bc1944319b9bd27a462469c8a437f4ff";
-    let endpoint = "https://mainnet.infura.io/v3/9c7178cede9f4a8a84a151d058bd609c";
+    let tx_hash = "0xcc699808af959a6c058a3b77f14f9dc18658c02b1b427d9d3cde01e370802ccf";
+    let endpoint = "http://127.0.0.1:9545";
     let res = get_receipt_from_tx_hash(endpoint, tx_hash).unwrap().logs;
+    println!("{:?}", res);
     for item in res {
         let mut stream = RlpStream::new();
         item.rlp_append(&mut stream);

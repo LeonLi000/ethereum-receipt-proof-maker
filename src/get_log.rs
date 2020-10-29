@@ -32,6 +32,7 @@ fn get_log_from_json(log_json: &LogJson) -> Result<Log> {
             address: convert_hex_to_address(log_json.address.clone())?,
             topics: convert_hex_strings_to_h256s(log_json.topics.clone())?,
             data: convert_hex_to_bytes(log_json.data.clone())?,
+            log_index: log_json.logIndex.clone(),
         }
     )
 }

@@ -91,6 +91,7 @@ pub struct Log {
     pub address: Address,
     pub topics: Vec<H256>,
     pub data: Bytes,
+    pub log_index: String,
     /*
     removed: bool,
     r#type: String,
@@ -105,10 +106,11 @@ pub struct Log {
 impl Encodable for Log {
     fn rlp_append(&self, rlp_stream: &mut RlpStream) {
         rlp_stream
-            .begin_list(3)
+            .begin_list(4)
             .append(&self.address)
             .append_list(&self.topics)
-            .append(&self.data);
+            .append(&self.data)
+            .append(&self.log_index);
     }
 }
 
@@ -161,7 +163,7 @@ pub struct ReceiptJson {
 #[derive(Clone, Debug, Deserialize)]
 pub struct LogJson {
     pub data: String,
-    pub removed: bool,
+    // pub removed: bool,
     // pub r#type: String,
     pub address: String,
     pub logIndex: String,
