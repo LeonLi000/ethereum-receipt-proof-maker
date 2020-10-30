@@ -63,7 +63,6 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<(types::H
         .and_then(get_branch_from_trie_and_put_in_state).and_then(get_hex_proof_from_branch_in_state);
     let mut res_receipt = get_receipt_from_tx_hash(endpoint.clone().as_str(), tx_hash.clone().as_str());
     let mut stream = RlpStream::new();
-    println!("res: {:?}", res_receipt);
     let receipt =  res_receipt.unwrap();
     let logs = &receipt.logs;
     receipt.rlp_append(&mut stream);
@@ -72,7 +71,6 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<(types::H
     let mut log_index = -1;
     let mut is_exist = false;
     for item in logs {
-        println!("log: {:?}", item);
         log_index += 1;
         if hex::encode(item.topics[0].0) == constants::LOCK_EVENT_STRING {
             let mut stream = RlpStream::new();
@@ -95,7 +93,7 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<(types::H
 #[test]
 fn test_get_hex_proof() {
     let endpoint = "http://127.0.0.1:9545";
-    let tx_hash = "0xcc699808af959a6c058a3b77f14f9dc18658c02b1b427d9d3cde01e370802ccf";
+    let tx_hash = "0xd09258150c1edb257fc41a2539c17d6077a41f797f350bc2d6ecd8ee3f5ea133";
     let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint));
     match proof {
         Ok(proof)=>{println!("{:?}", proof.clone());},
