@@ -7,12 +7,7 @@ use rlp::{
     RlpStream,
     Encodable
 };
-use ethereum_types::{
-    U256,
-    H256,
-    Bloom,
-    Address,
-};
+use ethereum_types::{U256, H256, Bloom, Address, H160};
 
 pub type Byte = u8;
 pub type Bytes = Vec<Byte>;
@@ -172,5 +167,18 @@ pub struct LogJson {
     pub topics: Vec<String>,
     pub transactionHash: String,
     pub transactionIndex: String,
+}
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct EthSpvProof {
+    pub log_index: i32,
+    pub log_entry_data: String,
+    pub receipt_index: u64,
+    pub receipt_data: String,
+    pub header_data: String,
+    pub proof: String,
+    pub token: H160,
+    pub lock_amount: u128,
+    pub ckb_recipient: String,
 }
 

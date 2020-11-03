@@ -46,11 +46,12 @@ use crate::get_receipts::{get_all_receipts_from_block_in_state_and_set_in_state,
 use crate::state::State;
 use crate::utils::convert_hex_to_h256;
 use crate::types::{
-    Receipt,
+    Receipt,EthSpvProof
 };
 use rlp::{Encodable, RlpStream};
+use ethabi::{Event, EventParam, Token, ParamType, RawLog};
 
-pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<(types::HexProof, String, String, u32, i32), errors::AppError>{
+pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<EthSpvProof, errors::AppError>{
     let proof = State::init(
         convert_hex_to_h256(tx_hash.clone())?,
         tx_hash.clone(),
@@ -67,15 +68,54 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<(types::H
     let logs = &receipt.logs;
     receipt.rlp_append(&mut stream);
     let receipt_data = hex::encode(stream.out());
-    let mut log_data = String::new();
+    // let mut log_data = String::new();
     let mut log_index = -1;
     let mut is_exist = false;
+
+    let mut eth_spv_proof = EthSpvProof{
+        log_index: -1,
+        log_entry_data: String::new(),
+        receipt_index: receipt.transaction_index.as_u64(),
+        receipt_data,
+        header_data: String::new(),
+        proof: proof.unwrap(),
+        token: Default::default(),
+        lock_amount: 0,
+        ckb_recipient: String::new(),
+    };
     for item in logs {
         log_index += 1;
-        if hex::encode(item.topics[0].0) == constants::LOCK_EVENT_STRING {
+        if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING {
+            let event = Event {
+                name: "Locked".to_string(),
+                inputs: vec![
+                    EventParam { name: "token".to_owned(), kind: ParamType::Address, indexed: true },
+                    EventParam { name: "sender".to_owned(), kind: ParamType::Address, indexed: true },
+                    EventParam { name: "amount".to_owned(), kind: ParamType::Uint(256), indexed: false },
+                    EventParam { name: "accountId".to_owned(), kind: ParamType::String, indexed: false },
+                ],
+                anonymous: false
+            };
+            let raw_log = RawLog{ topics: item.clone().topics, data: item.clone().data };
+            let result = event.parse_log(raw_log).unwrap();
+            for v in result.params {
+                match v.name.as_str() {
+                    "token" =>{
+                        eth_spv_proof.token = v.value.to_address().unwrap();
+                    }
+                    "amount" => {
+                        eth_spv_proof.lock_amount = v.value.to_uint().unwrap().as_u128();
+                    }
+                    "accountId" => {
+                        eth_spv_proof.ckb_recipient = v.value.to_string().unwrap();
+                    }
+                    _ => {}
+                }
+            }
             let mut stream = RlpStream::new();
             item.rlp_append(&mut stream);
-            log_data = hex::encode(stream.out());
+            eth_spv_proof.log_index = log_index;
+            eth_spv_proof.log_entry_data = hex::encode(stream.out());
             is_exist = true;
             break;
         }
@@ -83,16 +123,17 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<(types::H
     if !is_exist {
         return Err(errors::AppError::Custom(String::from("the locked tx is not exist.")));
     }
-    Ok((proof.unwrap(), receipt_data, log_data, receipt.transaction_index.as_u32(), log_index))
 
-
+    Ok(eth_spv_proof)
 }
+
+
 
 
 
 #[test]
 fn test_get_hex_proof() {
-    let endpoint = "http://127.0.0.1:9545";
+    let endpoint = "http://127.0.0.1:9545 ";
     let tx_hash = "0xd09258150c1edb257fc41a2539c17d6077a41f797f350bc2d6ecd8ee3f5ea133";
     let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint));
     match proof {
