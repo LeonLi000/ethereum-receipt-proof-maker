@@ -180,5 +180,6 @@ pub struct EthSpvProof {
     pub token: H160,
     pub lock_amount: u128,
     pub ckb_recipient: String,
+    pub block_hash: H256,
 }
 

@@ -82,6 +82,7 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<EthSpvPro
         token: Default::default(),
         lock_amount: 0,
         ckb_recipient: String::new(),
+        block_hash: receipt.block_hash,
     };
     for item in logs {
         log_index += 1;
