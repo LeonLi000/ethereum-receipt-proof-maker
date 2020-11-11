@@ -85,6 +85,7 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<EthSpvPro
         block_hash: receipt.block_hash,
     };
     for item in logs {
+        println!("item: {:?}", item);
         log_index += 1;
         if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING {
             let event = Event {
@@ -92,19 +93,23 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<EthSpvPro
                 inputs: vec![
                     EventParam { name: "token".to_owned(), kind: ParamType::Address, indexed: true },
                     EventParam { name: "sender".to_owned(), kind: ParamType::Address, indexed: true },
-                    EventParam { name: "amount".to_owned(), kind: ParamType::Uint(256), indexed: false },
-                    EventParam { name: "accountId".to_owned(), kind: ParamType::String, indexed: false },
+                    EventParam { name: "lockedAmount".to_owned(), kind: ParamType::Uint(256), indexed: false },
+                    EventParam { name: "bridgeFee".to_owned(), kind: ParamType::Uint(256), indexed: false },
+                    EventParam { name: "recipientLockscript".to_owned(), kind: ParamType::Bytes, indexed: false },
+                    EventParam { name: "replayResistOutpoint".to_owned(), kind: ParamType::Bytes, indexed: false },
+                    EventParam { name: "sudtExtraData".to_owned(), kind: ParamType::Bytes, indexed: false },
                 ],
                 anonymous: false
             };
             let raw_log = RawLog{ topics: item.clone().topics, data: item.clone().data };
             let result = event.parse_log(raw_log).unwrap();
+            println!("result: {:?}", result);
             for v in result.params {
                 match v.name.as_str() {
                     "token" =>{
                         eth_spv_proof.token = v.value.to_address().unwrap();
                     }
-                    "amount" => {
+                    "lockedAmount" => {
                         eth_spv_proof.lock_amount = v.value.to_uint().unwrap().as_u128();
                     }
                     "accountId" => {
@@ -135,7 +140,7 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<EthSpvPro
 #[test]
 fn test_get_hex_proof() {
     let endpoint = "http://127.0.0.1:9545 ";
-    let tx_hash = "0xd09258150c1edb257fc41a2539c17d6077a41f797f350bc2d6ecd8ee3f5ea133";
+    let tx_hash = "0xe3e774843422ef9930b4b83eb9c16849851d222e0b526907d9a74cb3556f2391";
     let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint));
     match proof {
         Ok(proof)=>{println!("{:?}", proof.clone());},
