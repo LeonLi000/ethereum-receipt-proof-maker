@@ -110,6 +110,9 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<EthSpvPro
                     "token" =>{
                         eth_spv_proof.token = v.value.to_address().unwrap();
                     }
+                    "sender" =>{
+                        eth_spv_proof.eth_address = v.value.to_address().unwrap();
+                    }
                     "lockedAmount" => {
                         eth_spv_proof.lock_amount = v.value.to_uint().unwrap().as_u128();
                     }
