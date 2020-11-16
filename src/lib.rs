@@ -86,7 +86,6 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<EthSpvPro
         recipient_lockscript: vec![],
     };
     for item in logs {
-        println!("item: {:?}", item);
         log_index += 1;
         if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING {
             let event = Event {
