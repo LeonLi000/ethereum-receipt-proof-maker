@@ -84,7 +84,6 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<EthSpvPro
         ckb_recipient: String::new(),
         block_hash: receipt.block_hash,
         recipient_lockscript: vec![],
-        eth_address: Default::default(),
     };
     for item in logs {
         println!("item: {:?}", item);
@@ -110,9 +109,6 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<EthSpvPro
                 match v.name.as_str() {
                     "token" =>{
                         eth_spv_proof.token = v.value.to_address().unwrap();
-                    }
-                    "sender" =>{
-                        eth_spv_proof.eth_address = v.value.to_address().unwrap();
                     }
                     "lockedAmount" => {
                         eth_spv_proof.lock_amount = v.value.to_uint().unwrap().as_u128();
