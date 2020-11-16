@@ -103,7 +103,7 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<EthSpvPro
             };
             let raw_log = RawLog{ topics: item.clone().topics, data: item.clone().data };
             let result = event.parse_log(raw_log).unwrap();
-            println!("result: {:?}", result);
+            println!("parse event log: {:?}", result);
             for v in result.params {
                 match v.name.as_str() {
                     "token" =>{
