@@ -181,5 +181,6 @@ pub struct EthSpvProof {
     pub lock_amount: u128,
     pub ckb_recipient: String,
     pub block_hash: H256,
+    pub recipient_lockscript: Vec<u8>,
 }
 
