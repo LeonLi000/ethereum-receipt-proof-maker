@@ -84,6 +84,7 @@ pub fn generate_eth_proof(tx_hash: String, endpoint: String) -> Result<EthSpvPro
         ckb_recipient: String::new(),
         block_hash: receipt.block_hash,
         recipient_lockscript: vec![],
+        eth_address: Default::default(),
     };
     for item in logs {
         println!("item: {:?}", item);
