@@ -1,13 +1,10 @@
-use std::result;
-use serde::Deserialize;
 use crate::errors::AppError;
 use crate::trie_nodes::Node;
+use ethereum_types::{Address, Bloom, H160, H256, U256};
+use rlp::{Encodable, RlpStream};
+use serde::Deserialize;
 use std::collections::HashMap;
-use rlp::{
-    RlpStream,
-    Encodable
-};
-use ethereum_types::{U256, H256, Bloom, Address, H160};
+use std::result;
 
 pub type Byte = u8;
 pub type Bytes = Vec<Byte>;
@@ -18,10 +15,14 @@ pub type ChildNodes = [Option<Bytes>; 16];
 pub type Result<T> = result::Result<T, AppError>;
 
 #[derive(Debug, Deserialize)]
-pub struct BlockRpcResponse { pub result: BlockJson }
+pub struct BlockRpcResponse {
+    pub result: BlockJson,
+}
 
 #[derive(Debug, Deserialize)]
-pub struct ReceiptRpcResponse { pub result: ReceiptJson }
+pub struct ReceiptRpcResponse {
+    pub result: ReceiptJson,
+}
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct Block {
@@ -49,7 +50,6 @@ pub struct Block {
     pub uncles: Vec<H256>,
 }
 
-
 #[derive(Clone, Debug, Deserialize)]
 pub struct Receipt {
     pub to: Address,
@@ -72,10 +72,9 @@ impl Encodable for Receipt {
         let rlp = rlp_stream.begin_list(4);
         match &self.status {
             true => rlp.append(&self.status),
-            false => rlp.append_empty_data()
+            false => rlp.append_empty_data(),
         };
-        rlp
-            .append(&self.cumulative_gas_used)
+        rlp.append(&self.cumulative_gas_used)
             .append(&self.logs_bloom)
             .append_list(&self.logs);
     }
@@ -169,7 +168,7 @@ pub struct LogJson {
     pub transactionIndex: String,
 }
 
-#[derive(Clone, Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize, Default)]
 pub struct EthSpvProof {
     pub log_index: i32,
     pub log_entry_data: String,
@@ -179,8 +178,10 @@ pub struct EthSpvProof {
     pub proof: String,
     pub token: H160,
     pub lock_amount: u128,
+    pub bridge_fee: u128,
     pub ckb_recipient: String,
     pub block_hash: H256,
     pub recipient_lockscript: Vec<u8>,
+    pub replay_resist_outpoint: Vec<u8>,
+    pub sudt_extra_data: Vec<u8>,
 }
-
