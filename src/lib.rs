@@ -74,7 +74,9 @@ pub fn generate_eth_proof(
     let mut res_receipt =
         get_receipt_from_tx_hash(endpoint.clone().as_str(), tx_hash.clone().as_str());
     let mut stream = RlpStream::new();
-    let receipt = res_receipt.unwrap();
+    let receipt =  res_receipt.unwrap();
+    println!("{:?}", receipt);
+
     let logs = &receipt.logs;
     receipt.rlp_append(&mut stream);
     let receipt_data = hex::encode(stream.out());
@@ -88,9 +90,11 @@ pub fn generate_eth_proof(
         receipt_index: receipt.transaction_index.as_u64(),
         receipt_data,
         block_hash: receipt.block_hash,
+        proof: proof.unwrap(),
         ..Default::default()
     };
     for item in logs {
+        println!("{:?}", item);
         log_index += 1;
         if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING {
             let event = Event {
@@ -182,8 +186,8 @@ pub fn generate_eth_proof(
 
 #[test]
 fn test_get_hex_proof() {
-    let endpoint = "http://127.0.0.1:9545 ";
-    let tx_hash = "0xe3e774843422ef9930b4b83eb9c16849851d222e0b526907d9a74cb3556f2391";
+    let endpoint = "http://127.0.0.1:8545";
+    let tx_hash = "0x26ac5c1ecd1a3d3bd8d8715c5302420dc29c2840dba3ff88de69d4fe85b339fd";
     let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint));
     match proof {
         Ok(proof) => {
