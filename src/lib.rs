@@ -60,10 +60,9 @@ pub fn generate_eth_proof(
     tx_hash: String,
     endpoint: String,
 ) -> Result<EthSpvProof, errors::AppError> {
-    let mut res_receipt =
-        get_receipt_from_tx_hash(endpoint.clone().as_str(), tx_hash.clone().as_str());
+    let receipt =
+        get_receipt_from_tx_hash(endpoint.clone().as_str(), tx_hash.clone().as_str())?;
     let mut stream = RlpStream::new();
-    let receipt =  res_receipt.unwrap();
     let logs = &receipt.logs;
     receipt.rlp_append(&mut stream);
     let mut log_index = -1;
