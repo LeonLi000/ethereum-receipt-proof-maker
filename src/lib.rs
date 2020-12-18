@@ -115,11 +115,6 @@ pub fn generate_eth_proof(
                         kind: ParamType::Bytes,
                         indexed: false,
                     },
-                    EventParam {
-                        name: "bridgeLockscript".to_owned(),
-                        kind: ParamType::Bytes,
-                        indexed: false,
-                    },
                 ],
                 anonymous: false,
             };
