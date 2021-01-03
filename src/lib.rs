@@ -1,6 +1,7 @@
 #![feature(try_trait)]
 // #![feature(const_vec_new)]
 #![feature(exclusive_range_pattern)]
+pub mod types;
 
 mod connect_to_node;
 mod constants;
@@ -26,7 +27,6 @@ mod state;
 mod test_utils;
 mod trie;
 mod trie_nodes;
-mod types;
 mod usage_info;
 mod utils;
 mod validate_cli_args;
