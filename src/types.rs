@@ -185,3 +185,11 @@ pub struct EthSpvProof {
     pub replay_resist_outpoint: Vec<u8>,
     pub sudt_extra_data: Vec<u8>,
 }
+
+#[derive(Clone, Debug, Deserialize, Default)]
+pub struct UnlockEvent {
+    pub token: H160,
+    pub recipient: H160,
+    pub received_amount: u128,
+    pub bridge_fee: u128,
+}

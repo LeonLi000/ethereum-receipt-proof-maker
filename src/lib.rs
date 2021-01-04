@@ -51,7 +51,7 @@ use crate::get_receipts::{
 use crate::get_receipts_trie::get_receipts_trie_and_set_in_state;
 use crate::get_tx_index::get_tx_index_and_add_to_state;
 use crate::state::State;
-use crate::types::{EthSpvProof, Receipt};
+use crate::types::{EthSpvProof, Receipt, UnlockEvent};
 use crate::utils::convert_hex_to_h256;
 use ethabi::{Event, EventParam, ParamType, RawLog, Token};
 use rlp::{Encodable, RlpStream};
@@ -158,6 +158,88 @@ pub fn generate_eth_proof(
     }
 
     Ok(eth_spv_proof)
+}
+
+pub fn parse_unlock_event(
+    tx_hash: String,
+    endpoint: String,
+) -> Result<UnlockEvent, errors::AppError> {
+    let receipt =
+        get_receipt_from_tx_hash(endpoint.clone().as_str(), tx_hash.clone().as_str())?;
+    let mut stream = RlpStream::new();
+    let logs = &receipt.logs;
+    receipt.rlp_append(&mut stream);
+    let mut is_exist = false;
+
+    let mut unlock_event = UnlockEvent {
+        ..Default::default()
+    };
+    for item in logs {
+        if hex::encode(item.clone().topics[0].0) == constants::UNLOCK_EVENT_STRING {
+            let event = Event {
+                name: "Locked".to_string(),
+                inputs: vec![
+                    EventParam {
+                        name: "token".to_owned(),
+                        kind: ParamType::Address,
+                        indexed: true,
+                    },
+                    EventParam {
+                        name: "recipient".to_owned(),
+                        kind: ParamType::Address,
+                        indexed: true,
+                    },
+                    EventParam {
+                        name: "sender".to_owned(),
+                        kind: ParamType::Address,
+                        indexed: true,
+                    },
+                    EventParam {
+                        name: "receivedAmount".to_owned(),
+                        kind: ParamType::Uint(256),
+                        indexed: false,
+                    },
+                    EventParam {
+                        name: "bridgeFee".to_owned(),
+                        kind: ParamType::Uint(256),
+                        indexed: false,
+                    },
+                ],
+                anonymous: false,
+            };
+            let raw_log = RawLog {
+                topics: item.clone().topics,
+                data: item.clone().data,
+            };
+            let result = event.parse_log(raw_log).unwrap();
+            for v in result.params {
+                match v.name.as_str() {
+                    "token" => {
+                        unlock_event.token = v.value.to_address().unwrap();
+                    }
+                    "recipient" => {
+                        unlock_event.recipient = v.value.to_address().unwrap();
+                    }
+                    "receivedAmount" => {
+                        unlock_event.received_amount = v.value.to_uint().unwrap().as_u128();
+                    }
+                    "bridgeFee" => {
+                        unlock_event.bridge_fee = v.value.to_uint().unwrap().as_u128();
+                    }
+                    _ => {}
+                }
+            }
+            is_exist = true;
+            break;
+        }
+    }
+    if !is_exist {
+        return Err(errors::AppError::Custom(String::from(
+            "the unlocked tx is not exist.",
+        )));
+    }
+
+    Ok(unlock_event)
 }
 
 #[test]
