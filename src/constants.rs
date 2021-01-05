@@ -19,7 +19,7 @@ pub const HASHED_NULL_NODE: H256 = H256(HASHED_NULL_NODE_BYTES);
 pub static DEFAULT_ENDPOINT: &'static str = "https://mainnet.infura.io/v3/9c7178cede9f4a8a84a151d058bd609c";
 pub const EMPTY_NIBBLES: Nibbles = Nibbles { data: Vec::new(), offset: 0 };
 pub static LOCK_EVENT_STRING: &'static str = "413055b58d692937cc2a7d80ca019c17e8d01175e58d11f157ae9124078b01d6";
-pub static UNLOCK_EVENT_STRING: &'static str = "";
+pub static UNLOCK_EVENT_STRING: &'static str = "8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925";
 
 const HASHED_NULL_NODE_BYTES: [u8; 32] = [ // NOTE: keccak hash of the RLP of null
     0x56, 0xe8, 0x1f, 0x17, 0x1b, 0xcc, 0x55, 0xa6,
