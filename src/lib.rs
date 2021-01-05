@@ -177,7 +177,7 @@ pub fn parse_unlock_event(
     for item in logs {
         if hex::encode(item.clone().topics[0].0) == constants::UNLOCK_EVENT_STRING {
             let event = Event {
-                name: "Locked".to_string(),
+                name: "Unlocked".to_string(),
                 inputs: vec![
                     EventParam {
                         name: "token".to_owned(),
