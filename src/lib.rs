@@ -78,6 +78,8 @@ pub fn generate_eth_proof(
     for item in logs {
         log_index += 1;
         let address_str = hex::encode(item.clone().address);
+        dbg!(address_str.clone());
+        dbg!(contract_addr.clone());
         if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING && address_str == contract_addr{
             let event = Event {
                 name: "Locked".to_string(),
