@@ -59,6 +59,7 @@ use rlp::{Encodable, RlpStream};
 pub fn generate_eth_proof(
     tx_hash: String,
     endpoint: String,
+    contract_addr: String,
 ) -> Result<EthSpvProof, errors::AppError> {
     let receipt =
         get_receipt_from_tx_hash(endpoint.clone().as_str(), tx_hash.clone().as_str())?;
@@ -76,7 +77,8 @@ pub fn generate_eth_proof(
     };
     for item in logs {
         log_index += 1;
-        if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING {
+        let address_str = hex::encode(item.clone().address);
+        if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING && address_str == contract_addr{
             let event = Event {
                 name: "Locked".to_string(),
                 inputs: vec![
@@ -166,6 +168,7 @@ pub fn generate_eth_proof(
 pub fn parse_unlock_event(
     tx_hash: String,
     endpoint: String,
+    contract_addr: String,
 ) -> Result<UnlockEvent, errors::AppError> {
     let receipt =
         get_receipt_from_tx_hash(endpoint.clone().as_str(), tx_hash.clone().as_str())?;
@@ -178,7 +181,8 @@ pub fn parse_unlock_event(
         ..Default::default()
     };
     for item in logs {
-        if hex::encode(item.clone().topics[0].0) == constants::UNLOCK_EVENT_STRING {
+        let address_str = hex::encode(item.clone().address);
+        if hex::encode(item.clone().topics[0].0) == constants::UNLOCK_EVENT_STRING && address_str == contract_addr {
             let event = Event {
                 name: "Unlocked".to_string(),
                 inputs: vec![
@@ -249,7 +253,7 @@ pub fn parse_unlock_event(
 fn test_get_hex_proof() {
     let endpoint = "https://mainnet.infura.io/v3/9c7178cede9f4a8a84a151d058bd609c";
     let tx_hash = "0xb540248a9cca048c5861dec953d7a776bc1944319b9bd27a462469c8a437f4ff";
-    let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint));
+    let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint), String::from(""));
     match proof {
         Ok(proof) => {
             println!("{:?}", proof.clone());
@@ -266,7 +270,7 @@ fn test_get_hex_proof() {
 fn test_parse_unlock_event() {
     let endpoint = "http://127.0.0.1:8545";
     let tx_hash = "0x71624173e72646d9db6f3018133a592d09cc226d0ff4f85e470ce0388ae62b92";
-    let proof = parse_unlock_event(String::from(tx_hash), String::from(endpoint));
+    let proof = parse_unlock_event(String::from(tx_hash), String::from(endpoint), String::from(""));
     match proof {
         Ok(proof) => {
             println!("{:?}", proof.clone());
