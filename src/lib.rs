@@ -78,9 +78,7 @@ pub fn generate_eth_proof(
     for item in logs {
         log_index += 1;
         let address_str = hex::encode(item.clone().address);
-        dbg!(address_str.clone());
-        dbg!(contract_addr.clone());
-        if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING && address_str == contract_addr{
+        if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING && address_str.to_lowercase() == contract_addr.to_lowercase() {
             let event = Event {
                 name: "Locked".to_string(),
                 inputs: vec![
@@ -184,7 +182,7 @@ pub fn parse_unlock_event(
     };
     for item in logs {
         let address_str = hex::encode(item.clone().address);
-        if hex::encode(item.clone().topics[0].0) == constants::UNLOCK_EVENT_STRING && address_str == contract_addr {
+        if hex::encode(item.clone().topics[0].0) == constants::UNLOCK_EVENT_STRING && address_str.to_lowercase() == contract_addr.to_lowercase() {
             let event = Event {
                 name: "Unlocked".to_string(),
                 inputs: vec![
