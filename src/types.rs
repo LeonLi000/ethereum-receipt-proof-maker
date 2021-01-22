@@ -184,6 +184,7 @@ pub struct EthSpvProof {
     pub recipient_lockscript: Vec<u8>,
     pub replay_resist_outpoint: Vec<u8>,
     pub sudt_extra_data: Vec<u8>,
+    pub sender: H160,
 }
 
 #[derive(Clone, Debug, Deserialize, Default)]
