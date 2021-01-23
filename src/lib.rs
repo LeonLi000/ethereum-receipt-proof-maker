@@ -53,6 +53,8 @@ use crate::types::{EthSpvProof, Receipt, UnlockEvent, Log};
 use crate::utils::convert_hex_to_h256;
 use ethabi::{Event, EventParam, ParamType, RawLog, Token};
 use rlp::{Encodable, RlpStream};
+use std::i64;
+
 
 pub fn get_logs_with_address(endpoint: String,
                              block_hash: String,
@@ -152,7 +154,7 @@ fn handle_unlock_event(item: &Log) -> Result<UnlockEvent, errors::AppError> {
 fn handle_lock_event(item: &Log) -> Result<EthSpvProof, errors::AppError> {
     let mut eth_spv_proof = EthSpvProof {
         log_index: clear_0x(item.log_index.as_str()).parse::<i32>().unwrap(),
-        receipt_index: clear_0x(item.transactionIndex.as_str()).parse::<u64>().unwrap(),
+        receipt_index: u64::from_str_radix(clear_0x(item.transactionIndex.as_str()), 16).unwrap(),
         block_hash: item.blockHash.clone(),
         tx_hash: item.transactionHash.clone(),
         ..Default::default()
@@ -456,8 +458,8 @@ pub fn clear_0x(s: &str) -> &str {
 
 #[test]
 fn test_parse_event() {
-    let endpoint = "http://127.0.0.1:8545";
-    let hash = "0x40fa987d246e38ae36b0b55a162173cf9dd0d06fd996ee30cfc4cb3b070c3ef6";
+    let endpoint = "https://ropsten.infura.io/v3/71c02c451b6248708e493c4ea007c3b2";
+    let hash = "0xf1349c36c5884acdbf973e47a71a94df509a2061779b30a0e356ecad91189563";
     let addr = "0xcd62e77cfe0386343c15c13528675aae9925d7ae";
     let ret = parse_event(endpoint, addr, hash);
     println!("{:?}", ret.unwrap().0);
