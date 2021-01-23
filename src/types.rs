@@ -190,11 +190,12 @@ pub struct EthSpvProof {
     pub lock_amount: u128,
     pub bridge_fee: u128,
     pub ckb_recipient: String,
-    pub block_hash: H256,
+    pub block_hash: String,
     pub recipient_lockscript: Vec<u8>,
     pub replay_resist_outpoint: Vec<u8>,
     pub sudt_extra_data: Vec<u8>,
     pub sender: H160,
+    pub tx_hash: String,
 }
 
 #[derive(Clone, Debug, Deserialize, Default)]

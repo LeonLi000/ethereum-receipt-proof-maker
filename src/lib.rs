@@ -152,6 +152,8 @@ fn handle_lock_event(item: &Log) -> Result<EthSpvProof, errors::AppError> {
     let mut eth_spv_proof = EthSpvProof {
         log_index: clear_0x(item.log_index.as_str()).parse::<i32>().unwrap(),
         receipt_index: clear_0x(item.transactionIndex.as_str()).parse::<u64>().unwrap(),
+        block_hash: item.blockHash.clone(),
+        tx_hash: item.transactionHash.clone(),
         ..Default::default()
     };
     let event = Event {
