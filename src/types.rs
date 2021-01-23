@@ -204,4 +204,5 @@ pub struct UnlockEvent {
     pub recipient: H160,
     pub received_amount: u128,
     pub bridge_fee: u128,
+    pub tx_hash: String,
 }

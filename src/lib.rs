@@ -89,6 +89,7 @@ pub fn parse_event(endpoint: &str,
 
 fn handle_unlock_event(item: &Log) -> Result<UnlockEvent, errors::AppError> {
     let mut unlock_event = UnlockEvent {
+        tx_hash: item.transactionHash.clone(),
         ..Default::default()
     };
     let event = Event {
