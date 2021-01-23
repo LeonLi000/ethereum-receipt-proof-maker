@@ -153,7 +153,7 @@ fn handle_unlock_event(item: &Log) -> Result<UnlockEvent, errors::AppError> {
 
 fn handle_lock_event(item: &Log) -> Result<EthSpvProof, errors::AppError> {
     let mut eth_spv_proof = EthSpvProof {
-        log_index: i32::from_str_radix(clear_0x(item.log_index.as_str()), 16).unwrap(),
+        log_index: 0,
         receipt_index: u64::from_str_radix(clear_0x(item.transactionIndex.as_str()), 16).unwrap(),
         block_hash: item.blockHash.clone(),
         tx_hash: item.transactionHash.clone(),
@@ -258,6 +258,7 @@ pub fn generate_eth_proof(
     for item in logs {
         log_index += 1;
         let address_str = hex::encode(item.clone().address);
+        let xx = hex::encode(item.clone().topics[0].0);
         if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING && address_str.to_lowercase() == contract_addr.to_lowercase() {
             let event = Event {
                 name: "Locked".to_string(),
@@ -433,9 +434,9 @@ pub fn parse_unlock_event(
 
 #[test]
 fn test_get_hex_proof() {
-    let endpoint = "https://mainnet.infura.io/v3/9c7178cede9f4a8a84a151d058bd609c";
-    let tx_hash = "0xb540248a9cca048c5861dec953d7a776bc1944319b9bd27a462469c8a437f4ff";
-    let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint), String::from(""));
+    let endpoint = "https://ropsten.infura.io/v3/71c02c451b6248708e493c4ea007c3b2";
+    let tx_hash = "0xfb6a8e1b7efa24e14b855678e253f7a5076f87716cf52b44a1d6f173e14ab745";
+    let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint), String::from("430a0670b8197e6a67cfe921b0d5601a0fa3dab7"));
     match proof {
         Ok(proof) => {
             println!("{:?}", proof.clone());
@@ -459,7 +460,7 @@ pub fn clear_0x(s: &str) -> &str {
 #[test]
 fn test_parse_event() {
     let endpoint = "https://ropsten.infura.io/v3/71c02c451b6248708e493c4ea007c3b2";
-    let hash = "0xf1349c36c5884acdbf973e47a71a94df509a2061779b30a0e356ecad91189563";
+    let hash = "0x4d2682dbbd6310dab03a3401db7c3512dc40945c88ad98e05d21f00643e604e1";
     let addr = "0x430a0670b8197e6a67cfe921b0d5601a0fa3dab7";
     let ret = parse_event(endpoint, addr, hash);
     println!("{:?}", ret.unwrap().0);
