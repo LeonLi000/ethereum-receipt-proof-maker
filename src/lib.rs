@@ -249,7 +249,7 @@ pub fn generate_eth_proof(
     let mut eth_spv_proof = EthSpvProof {
         log_index: -1,
         receipt_index: receipt.transaction_index.as_u64(),
-        block_hash: receipt.block_hash,
+
         ..Default::default()
     };
     for item in logs {
@@ -329,6 +329,8 @@ pub fn generate_eth_proof(
                 }
             }
             eth_spv_proof.log_index = log_index;
+            eth_spv_proof.block_hash = item.blockHash.clone();
+            eth_spv_proof.tx_hash = item.transactionHash.clone();
             is_exist = true;
             break;
         }
