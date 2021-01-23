@@ -7,6 +7,7 @@ use crate::types::{
     Result,
     BlockRpcResponse,
     ReceiptRpcResponse,
+    LogRpcResponse
 };
 
 pub fn make_rpc_call(endpoint: &str, json: Json) -> Result<reqwest::Response> {
@@ -49,6 +50,12 @@ pub fn deserialize_to_block_rpc_response(
 pub fn deserialize_to_receipt_rpc_response(
     rpc_call_result: String
 ) -> Result<ReceiptRpcResponse> {
+    Ok(serde_json::from_str(&rpc_call_result)?)
+}
+
+pub fn deserialize_to_log_rpc_response(
+    rpc_call_result: String
+) -> Result<LogRpcResponse> {
     Ok(serde_json::from_str(&rpc_call_result)?)
 }
 

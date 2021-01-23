@@ -45,16 +45,191 @@ extern crate serial_test_derive;
 use crate::get_block::get_block_from_tx_hash_in_state_and_set_in_state;
 use crate::get_branch_from_trie::get_branch_from_trie_and_put_in_state;
 use crate::get_hex_proof_from_branch::get_hex_proof_from_branch_in_state;
-use crate::get_receipts::{
-    get_all_receipts_from_block_in_state_and_set_in_state, get_receipt_from_tx_hash,
-};
+use crate::get_receipts::{get_all_receipts_from_block_in_state_and_set_in_state, get_receipt_from_tx_hash, get_logs};
 use crate::get_receipts_trie::get_receipts_trie_and_set_in_state;
 use crate::get_tx_index::get_tx_index_and_add_to_state;
 use crate::state::State;
-use crate::types::{EthSpvProof, Receipt, UnlockEvent};
+use crate::types::{EthSpvProof, Receipt, UnlockEvent, Log};
 use crate::utils::convert_hex_to_h256;
 use ethabi::{Event, EventParam, ParamType, RawLog, Token};
 use rlp::{Encodable, RlpStream};
+
+pub fn get_logs_with_address(endpoint: String,
+                             block_hash: String,
+                             contract_addr: String,) -> Result<Vec<Log>, errors::AppError> {
+    get_logs(endpoint.as_str(), contract_addr.as_str(), block_hash.as_str())
+
+}
+
+pub fn parse_event(endpoint: &str,
+                   contract_addr: &str,
+                   block_hash: &str,
+                   ) -> Result<(Vec<EthSpvProof>, Vec<UnlockEvent>), errors::AppError> {
+    let logs = get_logs(endpoint, contract_addr, block_hash)?;
+    if logs.is_empty() {
+        return Err(errors::AppError::Custom(String::from(
+            "the event is not exist.",
+        )));
+    }
+    let mut lock_event = vec![];
+    let mut unlock_event = vec![];
+    for item in logs {
+        if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING {
+            // handle lock event
+            let event = handle_lock_event(&item)?;
+            lock_event.push(event);
+        } else if hex::encode(item.clone().topics[0].0) == constants::UNLOCK_EVENT_STRING {
+            // handle unlock event
+            let event = handle_unlock_event(&item)?;
+            unlock_event.push(event);
+        }
+    }
+    Ok((lock_event, unlock_event))
+}
+
+fn handle_unlock_event(item: &Log) -> Result<UnlockEvent, errors::AppError> {
+    let mut unlock_event = UnlockEvent {
+        ..Default::default()
+    };
+    let event = Event {
+        name: "Unlocked".to_string(),
+        inputs: vec![
+            EventParam {
+                name: "token".to_owned(),
+                kind: ParamType::Address,
+                indexed: true,
+            },
+            EventParam {
+                name: "recipient".to_owned(),
+                kind: ParamType::Address,
+                indexed: true,
+            },
+            EventParam {
+                name: "sender".to_owned(),
+                kind: ParamType::Address,
+                indexed: true,
+            },
+            EventParam {
+                name: "receivedAmount".to_owned(),
+                kind: ParamType::Uint(256),
+                indexed: false,
+            },
+            EventParam {
+                name: "bridgeFee".to_owned(),
+                kind: ParamType::Uint(256),
+                indexed: false,
+            },
+        ],
+        anonymous: false,
+    };
+    let raw_log = RawLog {
+        topics: item.clone().topics,
+        data: item.clone().data,
+    };
+    let result = event.parse_log(raw_log).unwrap();
+    for v in result.params {
+        match v.name.as_str() {
+            "token" => {
+                unlock_event.token = v.value.to_address().unwrap();
+            }
+            "recipient" => {
+                unlock_event.recipient = v.value.to_address().unwrap();
+            }
+            "receivedAmount" => {
+                unlock_event.received_amount = v.value.to_uint().unwrap().as_u128();
+            }
+            "bridgeFee" => {
+                unlock_event.bridge_fee = v.value.to_uint().unwrap().as_u128();
+            }
+            _ => {}
+        }
+    }
+    Ok(unlock_event)
+
+}
+
+fn handle_lock_event(item: &Log) -> Result<EthSpvProof, errors::AppError> {
+    let mut eth_spv_proof = EthSpvProof {
+        log_index: clear_0x(item.log_index.as_str()).parse::<i32>().unwrap(),
+        receipt_index: clear_0x(item.transactionIndex.as_str()).parse::<u64>().unwrap(),
+        ..Default::default()
+    };
+    let event = Event {
+        name: "Locked".to_string(),
+        inputs: vec![
+            EventParam {
+                name: "token".to_owned(),
+                kind: ParamType::Address,
+                indexed: true,
+            },
+            EventParam {
+                name: "sender".to_owned(),
+                kind: ParamType::Address,
+                indexed: true,
+            },
+            EventParam {
+                name: "lockedAmount".to_owned(),
+                kind: ParamType::Uint(256),
+                indexed: false,
+            },
+            EventParam {
+                name: "bridgeFee".to_owned(),
+                kind: ParamType::Uint(256),
+                indexed: false,
+            },
+            EventParam {
+                name: "recipientLockscript".to_owned(),
+                kind: ParamType::Bytes,
+                indexed: false,
+            },
+            EventParam {
+                name: "replayResistOutpoint".to_owned(),
+                kind: ParamType::Bytes,
+                indexed: false,
+            },
+            EventParam {
+                name: "sudtExtraData".to_owned(),
+                kind: ParamType::Bytes,
+                indexed: false,
+            },
+        ],
+        anonymous: false,
+    };
+    let raw_log = RawLog {
+        topics: item.topics.clone(),
+        data: item.data.clone(),
+    };
+    let result = event.parse_log(raw_log).unwrap();
+    for v in result.params {
+        match v.name.as_str() {
+            "token" => {
+                eth_spv_proof.token = v.value.to_address().unwrap();
+            }
+            "sender" => {
+                eth_spv_proof.sender = v.value.to_address().unwrap();
+            }
+            "lockedAmount" => {
+                eth_spv_proof.lock_amount = v.value.to_uint().unwrap().as_u128();
+            }
+            "bridgeFee" => {
+                eth_spv_proof.bridge_fee = v.value.to_uint().unwrap().as_u128();
+            }
+            "recipientLockscript" => {
+                eth_spv_proof.recipient_lockscript = v.value.to_bytes().unwrap();
+            }
+            "replayResistOutpoint" => {
+                eth_spv_proof.replay_resist_outpoint = v.value.to_bytes().unwrap();
+            }
+            "sudtExtraData" => {
+                eth_spv_proof.sudt_extra_data = v.value.to_bytes().unwrap();
+            }
+            _ => {}
+        }
+    }
+
+    Ok(eth_spv_proof)
+}
+
 
 pub fn generate_eth_proof(
     tx_hash: String,
@@ -264,6 +439,35 @@ fn test_get_hex_proof() {
     }
     ///////////////////////////////f901b6f901b3822080b901adf901aa0182d0d9b9010000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000010000000000000000000000000000000000000000000000000000000408000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000010000000000000000000000000000000000000000000000000000000400000000000100000000000000000000000000080000000000000000000000000000000000000000000100002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000f8a1f89f94dac17f958d2ee523a2206206994597c13d831ec7f863a0ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3efa00000000000000000000000006cc5f688a315f3dc28a7781717a9a798a59fda7ba00000000000000000000000007e7a32d9dc98c485c489be8e732f97b4ffe3a4cda000000000000000000000000000000000000000000000000000000001a13b860083307830
     // assert_eq!(proof.unwrap(), "f901b2f901af822080b901a9f901a60182d0d9b9010000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000010000000000000000000000000000000000000000000000000000000408000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000010000000000000000000000000000000000000000000000000000000400000000000100000000000000000000000000080000000000000000000000000000000000000000000100002000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000002000000000000000000000000f89df89b94dac17f958d2ee523a2206206994597c13d831ec7f863a0ddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3efa00000000000000000000000006cc5f688a315f3dc28a7781717a9a798a59fda7ba00000000000000000000000007e7a32d9dc98c485c489be8e732f97b4ffe3a4cda000000000000000000000000000000000000000000000000000000001a13b8600");
+}
+
+pub fn clear_0x(s: &str) -> &str {
+    if &s[..2] == "0x" || &s[..2] == "0X" {
+        &s[2..]
+    } else {
+        s
+    }
+}
+
+#[test]
+fn test_parse_event() {
+    let endpoint = "http://127.0.0.1:8545";
+    let hash = "0x40fa987d246e38ae36b0b55a162173cf9dd0d06fd996ee30cfc4cb3b070c3ef6";
+    let addr = "0xcd62e77cfe0386343c15c13528675aae9925d7ae";
+    let ret = parse_event(endpoint, addr, hash);
+    println!("{:?}", ret.unwrap().0);
+    println!("hahahah");
+}
+
+#[test]
+fn test_get_logs() {
+    let endpoint = "http://127.0.0.1:8545";
+    let hash = "0x40fa987d246e38ae36b0b55a162173cf9dd0d06fd996ee30cfc4cb3b070c3ef6";
+    let addr = "0xcd62e77cfe0386343c15c13528675aae9925d7ae";
+    let ret = get_logs(endpoint, addr, hash);
+    println!("{:?}", ret);
+    println!("hahahah");
+
 }
 
 #[test]

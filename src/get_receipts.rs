@@ -1,9 +1,10 @@
 use crate::state::State;
-use crate::get_rpc_call_jsons::get_transaction_receipt_json;
+use crate::get_rpc_call_jsons::{get_transaction_receipt_json, get_logs_json};
 use crate::make_rpc_call::{
     make_rpc_call,
     get_response_text,
     deserialize_to_receipt_rpc_response,
+    deserialize_to_log_rpc_response
 };
 use ethereum_types::{
     H160,
@@ -21,10 +22,12 @@ use crate::types::{
     Result,
     Receipt,
     ReceiptJson,
+    Log,
 };
 use crate::get_log::{
     get_logs_bloom_from_logs,
     get_logs_from_receipt_json,
+    get_logs_from_logs_json
 };
 
 pub fn deserialize_receipt_json_to_receipt_struct(
@@ -78,6 +81,16 @@ pub fn get_receipt_from_tx_hash(
         .and_then(get_response_text)
         .and_then(deserialize_to_receipt_rpc_response)
         .and_then(|res| deserialize_receipt_json_to_receipt_struct(res.result))
+}
+
+pub fn get_logs(endpoint: &str,
+                address: &str,
+                block_hash: &str) -> Result<Vec<Log>> {
+    get_logs_json(address, block_hash)
+        .and_then(|rpc_json| make_rpc_call(endpoint, rpc_json))
+        .and_then(get_response_text)
+        .and_then(deserialize_to_log_rpc_response)
+        .and_then(|res| get_logs_from_logs_json(res.result))
 }
 
 fn get_receipts_from_tx_hashes(

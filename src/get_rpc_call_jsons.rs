@@ -34,6 +34,20 @@ pub fn get_transaction_receipt_json(tx_hash: &str) -> Result<Value> {
     )
 }
 
+pub fn get_logs_json(address: &str, block_hash: &str) -> Result<Value> {
+    Ok(
+        json!({
+            "id": "1",
+            "jsonrpc": "2.0",
+            "method": "eth_getLogs",
+            "params": [{
+                  "address": address,
+                  "blockhash": block_hash,
+                }],
+        })
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

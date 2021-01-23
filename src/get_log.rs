@@ -26,14 +26,28 @@ fn calculate_bloom_from_log(log: &Log) -> Bloom {
         )
 }
 
-fn get_log_from_json(log_json: &LogJson) -> Result<Log> {
+pub fn get_log_from_json(log_json: &LogJson) -> Result<Log> {
     Ok(
         Log {
             address: convert_hex_to_address(log_json.address.clone())?,
             topics: convert_hex_strings_to_h256s(log_json.topics.clone())?,
             data: convert_hex_to_bytes(log_json.data.clone())?,
             log_index: log_json.logIndex.clone(),
+            transactionHash: log_json.transactionHash.to_string(),
+            blockHash: log_json.blockHash.to_string(),
+            transactionIndex: log_json.transactionIndex.to_string()
         }
+    )
+}
+
+pub fn get_logs_from_logs_json(
+    logs_json: Vec<LogJson>
+) -> Result <Vec<Log>> {
+    Ok(
+        logs_json
+            .iter()
+            .map(|x| get_log_from_json(x).unwrap())
+            .collect()
     )
 }
 

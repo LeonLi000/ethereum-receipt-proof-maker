@@ -24,6 +24,11 @@ pub struct ReceiptRpcResponse {
     pub result: ReceiptJson,
 }
 
+#[derive(Debug, Deserialize)]
+pub struct LogRpcResponse {
+    pub result: Vec<LogJson>,
+}
+
 #[derive(Clone, Debug, Deserialize)]
 pub struct Block {
     // pub author: Address,
@@ -86,13 +91,15 @@ pub struct Log {
     pub topics: Vec<H256>,
     pub data: Bytes,
     pub log_index: String,
+    pub transactionHash: String,
+    pub blockHash: String,
+    pub transactionIndex: String,
     /*
     removed: bool,
     r#type: String,
     logIndex: String,
     blockHash: String,
     blockNumber: String,
-    transactionHash: String,
     transactionIndex: String,
     */
 }
@@ -100,11 +107,14 @@ pub struct Log {
 impl Encodable for Log {
     fn rlp_append(&self, rlp_stream: &mut RlpStream) {
         rlp_stream
-            .begin_list(4)
+            .begin_list(7)
             .append(&self.address)
             .append_list(&self.topics)
             .append(&self.data)
-            .append(&self.log_index);
+            .append(&self.log_index)
+            .append(&self.transactionHash)
+            .append(&self.blockHash)
+            .append(&self.transactionIndex);
     }
 }
 
