@@ -78,7 +78,8 @@ pub fn parse_event(endpoint: &str,
     for item in logs {
         if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING {
             // handle lock event
-            let event = handle_lock_event(&item)?;
+            // let event = handle_lock_event(item.clone())?;
+            let event = generate_eth_proof(item.transactionHash, String::from(endpoint), String::from(clear_0x(contract_addr)))?;
             lock_event.push(event);
         } else if hex::encode(item.clone().topics[0].0) == constants::UNLOCK_EVENT_STRING {
             // handle unlock event
@@ -151,9 +152,9 @@ fn handle_unlock_event(item: &Log) -> Result<UnlockEvent, errors::AppError> {
 
 }
 
-fn handle_lock_event(item: &Log) -> Result<EthSpvProof, errors::AppError> {
+fn handle_lock_event(item: Log) -> Result<EthSpvProof, errors::AppError> {
     let mut eth_spv_proof = EthSpvProof {
-        log_index: 0,
+        log_index: i32::from_str_radix(clear_0x(item.log_index.as_str()), 16).unwrap(),
         receipt_index: u64::from_str_radix(clear_0x(item.transactionIndex.as_str()), 16).unwrap(),
         block_hash: item.blockHash.clone(),
         tx_hash: item.transactionHash.clone(),
@@ -258,7 +259,6 @@ pub fn generate_eth_proof(
     for item in logs {
         log_index += 1;
         let address_str = hex::encode(item.clone().address);
-        let xx = hex::encode(item.clone().topics[0].0);
         if hex::encode(item.clone().topics[0].0) == constants::LOCK_EVENT_STRING && address_str.to_lowercase() == contract_addr.to_lowercase() {
             let event = Event {
                 name: "Locked".to_string(),
@@ -435,7 +435,7 @@ pub fn parse_unlock_event(
 #[test]
 fn test_get_hex_proof() {
     let endpoint = "https://ropsten.infura.io/v3/71c02c451b6248708e493c4ea007c3b2";
-    let tx_hash = "0xfb6a8e1b7efa24e14b855678e253f7a5076f87716cf52b44a1d6f173e14ab745";
+    let tx_hash = "0xfeaf95988d393e33e024056ae5b3cc9ba5d7b75b437c4059264711c62628249d";
     let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint), String::from("430a0670b8197e6a67cfe921b0d5601a0fa3dab7"));
     match proof {
         Ok(proof) => {
@@ -460,18 +460,19 @@ pub fn clear_0x(s: &str) -> &str {
 #[test]
 fn test_parse_event() {
     let endpoint = "https://ropsten.infura.io/v3/71c02c451b6248708e493c4ea007c3b2";
-    let hash = "0x4d2682dbbd6310dab03a3401db7c3512dc40945c88ad98e05d21f00643e604e1";
+    // let endpoint = "http://127.0.0.1:8545";
+    let hash = "0x480fc6cca516277b01b1e6b8a7c771d1b747096da3724d6aa7c8d9f4e2302278";
     let addr = "0x430a0670b8197e6a67cfe921b0d5601a0fa3dab7";
-    let ret = parse_event(endpoint, addr, hash);
-    println!("{:?}", ret.unwrap().0);
+    let (lock, unlock) = parse_event(endpoint, addr, hash).unwrap();
+    println!("{:?}", lock);
     println!("hahahah");
 }
 
 #[test]
 fn test_get_logs() {
-    let endpoint = "http://127.0.0.1:8545";
-    let hash = "0x40fa987d246e38ae36b0b55a162173cf9dd0d06fd996ee30cfc4cb3b070c3ef6";
-    let addr = "0xcd62e77cfe0386343c15c13528675aae9925d7ae";
+    let endpoint = "https://ropsten.infura.io/v3/71c02c451b6248708e493c4ea007c3b2";
+    let hash = "0x480fc6cca516277b01b1e6b8a7c771d1b747096da3724d6aa7c8d9f4e2302278";
+    let addr = "0x430a0670b8197e6a67cfe921b0d5601a0fa3dab7";
     let ret = get_logs(endpoint, addr, hash);
     println!("{:?}", ret);
     println!("hahahah");
