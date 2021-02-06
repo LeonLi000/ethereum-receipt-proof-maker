@@ -80,6 +80,11 @@ pub fn parse_event(endpoint: &str,
             // handle lock event
             // let event = handle_lock_event(item.clone())?;
             let event = generate_eth_proof(item.transactionHash, String::from(endpoint), String::from(clear_0x(contract_addr)))?;
+            if event.block_hash != block_hash {
+                return Err(errors::AppError::Custom(String::from(
+                    "the block hash is invalid. make sure the block is on the main chain.",
+                )));
+            }
             lock_event.push(event);
         } else if hex::encode(item.clone().topics[0].0) == constants::UNLOCK_EVENT_STRING {
             // handle unlock event
@@ -435,8 +440,8 @@ pub fn parse_unlock_event(
 #[test]
 fn test_get_hex_proof() {
     let endpoint = "https://ropsten.infura.io/v3/71c02c451b6248708e493c4ea007c3b2";
-    let tx_hash = "0xfeaf95988d393e33e024056ae5b3cc9ba5d7b75b437c4059264711c62628249d";
-    let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint), String::from("430a0670b8197e6a67cfe921b0d5601a0fa3dab7"));
+    let tx_hash = "0xf576731c8b9033ee1c15665a58ed0e513946f1f3ef22c009546817d3daed836e";
+    let proof = generate_eth_proof(String::from(tx_hash), String::from(endpoint), String::from("4347818b33aaf0b442a977900585b9ad1e1b581f"));
     match proof {
         Ok(proof) => {
             println!("{:?}", proof.clone());
@@ -518,4 +523,11 @@ fn test_get_log_from_txhash() {
         item.rlp_append(&mut stream);
         println!("{:?}", hex::encode(stream.out()));
     }
+}
+
+#[test]
+fn test_decode() {
+    let str = "f901f180a048201c1e6820c5a6a7063d7b143d68206b50c8d1fd4a78e57d4c4f8aeefcb2efa08bff796a59c00b08cc351d0c446dd67a8ded8872a3a1f583bb7007f2dacd1456a0dce11eeb6888cc63c232db7cba3f970f4b6a66f24952b7b013e446d7c959b813a0ba6c2fe47e1d1ef0b66e16d481953928c161b368b66c6a6cc7ee334f844ae8c1a0a158a490139ecd3e78874d1ea789cea6d6dce1c761097ab7e5e93ddf68490ec1a089d029f91f9e17b096dafdf529d195bc04d117072bbccdac54d4ce41532a5d23a03cc79fac9421ead02318a8b0feb1bc3acdaefbd3c733350158b55a52ef6ce99aa03d515de67f30144481e95e76fcd7f309e4c16562da2e12e2e152c8f5982206dda05834e55e8ced41cf79d32d6b5334f88e29445dff1baed5f49c7d62daa663a6ada0d25d3f853e2b860ce62d78b253c863ed10f9c2e220ddab6cf83fedd34190507ea0130d8e95e892ef14f277197d73d0340982986ab2c5b2b07ca792f4d981d57162a0e572f5026634f627200c74c717b4efc90eaaa869d4b7c372d11e6190e6f3e265a0ba1bca85a216fdbf76695f6252dd633614c78367e4f8f6f0d9fff1471d8bec8aa012bfd3a5f2458e08f77a1e7912c1e6d85a047a1841112a160c8bb00e9273b432a0f85a29ba78af0d0c24c2a3d8efb90d5ba9631162feed3543616195e3a1ee2c4680";
+    let decode_str = hex::decode(str).unwrap();
+    dbg!(decode_str);
 }
